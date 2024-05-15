@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESP32 Data</title>
+</head>
+<body>
+  <h1>ESP32 Data</h1>
+  <input type="text" id="data-input" placeholder="Enter data...">
+  <button id="send-button">Send Data</button>
+  <ul id="data-list"></ul>
+  <script>
+    const dataList = document.getElementById('data-list');
+    const dataInput = document.getElementById('data-input');
+    const sendButton = document.getElementById('send-button');
+
+    const ws = new WebSocket('ws://localhost:8080');
+
+    ws.onopen = () => {
+      console.log('Connected to WebSocket server');
+    };
+
+    ws.onmessage = (event) => {
+      const newData = JSON.parse(event.data);
+      const listItem = document.createElement('li');
+      listItem.textContent = `Temperature: ${newData.temperature}, Humidity: ${newData.humidity}`;
+      dataList.appendChild(listItem);
+    };
+
+    sendButton.addEventListener('click', () => {
+      const data = dataInput.value;
+      ws.send(data);
+      dataInput.value = ''; // Clear input field after sending
+    });
+  </script>
+</body>
+</html>
