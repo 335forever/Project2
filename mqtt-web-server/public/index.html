@@ -1,38 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESP32 Data</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Gadern Control Panel</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h1>ESP32 Data</h1>
-  <input type="text" id="data-input" placeholder="Enter data...">
-  <button id="send-button">Send Data</button>
-  <ul id="data-list"></ul>
-  <script>
-    const dataList = document.getElementById('data-list');
-    const dataInput = document.getElementById('data-input');
-    const sendButton = document.getElementById('send-button');
+    <h1>Bảng điều khiển</h1>
+    <div id="chart-container">
+        <canvas id="dhtChart"></canvas>
+        <h2>Biểu đồ thời gian thực</h2>
+    </div>
+    <div id="devices-container">
 
-    const ws = new WebSocket('ws://localhost:8080');
-
-    ws.onopen = () => {
-      console.log('Connected to WebSocket server');
-    };
-
-    ws.onmessage = (event) => {
-      const newData = JSON.parse(event.data);
-      const listItem = document.createElement('li');
-      listItem.textContent = `Temperature: ${newData.temperature}, Humidity: ${newData.humidity}`;
-      dataList.appendChild(listItem);
-    };
-
-    sendButton.addEventListener('click', () => {
-      const data = dataInput.value;
-      ws.send(data);
-      dataInput.value = ''; // Clear input field after sending
-    });
-  </script>
+    </div>
 </body>
 </html>

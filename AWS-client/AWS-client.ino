@@ -10,6 +10,7 @@
  
 #define AWS_IOT_PUBLISH_TOPIC   "esp32/pub"
 #define AWS_IOT_SUBSCRIBE_TOPIC "esp32/sub"
+#define DEVICES_INFO            "devicesInfo"
  
 float h ;
 float t;
@@ -59,6 +60,9 @@ void connectAWS()
  
   // Subscribe to a topic
   client.subscribe(AWS_IOT_SUBSCRIBE_TOPIC);
+
+  // Subscribe to a topic
+  client.subscribe(DEVICES_INFO);
  
   Serial.println("AWS IoT Connected!");
 }
@@ -79,11 +83,52 @@ void messageHandler(char* topic, byte* payload, unsigned int length)
   Serial.print("incoming: ");
   Serial.println(topic);
  
-  StaticJsonDocument<200> doc;
-  deserializeJson(doc, payload);
-  const char* message = doc["message"];
-  Serial.println(message);
+  // Kiểm tra xem topic nhận được là từ topic nào
+  if (strcmp(topic, AWS_IOT_SUBSCRIBE_TOPIC) == 0) {
+    // Xử lý thông tin từ topic cũ
+
+    // Parse JSON payload
+    StaticJsonDocument<512> doc;
+    DeserializationError error = deserializeJson(doc, payload, length);
+    if (error) {
+      Serial.print(F("deserializeJson() failed: "));
+      Serial.println(error.c_str());
+      return;
+    }
+
+    // Xử lý dữ liệu từ topic cũ ở đây
+  }
+  else if (strcmp(topic, DEVICES_INFO) == 0) {
+    // Xử lý thông tin từ topic mới
+    
+    // Parse JSON payload
+    StaticJsonDocument<512> doc;
+    DeserializationError error = deserializeJson(doc, payload, length);
+    if (error) {
+      Serial.print(F("deserializeJson() failed: "));
+      Serial.println(error.c_str());
+      return;
+    }
+
+    // Lặp qua từng phần tử trong mảng JSON
+    for (JsonVariant device : doc.as<JsonArray>()) {
+      // Trích xuất thông tin GPIO và trạng thái
+      int gpio = device["gpio"];
+      int status = device["status"];
+
+      // In ra thông tin trích xuất được
+      Serial.print("GPIO: ");
+      Serial.print(gpio);
+      Serial.print(", Status: ");
+      Serial.println(status);
+
+      // Thực hiện các hành động điều khiển GPIO tại đây
+      // Ví dụ:
+      // digitalWrite(gpio, status);
+    }
+  }
 }
+
  
 void setup()
 {
@@ -112,5 +157,5 @@ void loop()
  
   publishMessage();
   client.loop();
-  delay(1000);
+  delay(3000);
 }
