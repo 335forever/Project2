@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         // Lấy dữ liệu device
-        const response  = await fetch('http://localhost:3000/api/data/getdevicesinfo');
+        const response  = await fetch('/api/data/getdevicesinfo');
         const devices = await response .json();
         const container = document.getElementById('devices-container');
         devices.forEach(device => {
@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function updateDeviceStatus(deviceId, status) {
     try {
-        const response = await fetch('http://localhost:3000/api/devices/update', {
+        const response = await fetch('/api/devices/update', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
