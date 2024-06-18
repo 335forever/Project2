@@ -1,0 +1,130 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --main-background: #FEF6E4;
+    --sub-background: #F3D2C1;
+    --text-color: #001858;
+    --accent-color: #1ABC9C;
+}
+
+body {
+    background-color: var(--main-background);
+}
+
+h1 {
+    text-align: center;
+    color: var(--text-color);
+    font-size: 50px;
+}
+
+fieldset {
+    width: 70%;
+    margin: 0 auto;
+    border-radius: 5px;
+    background-color: var(--sub-background);
+}
+
+fieldset legend {
+    color: var(--text-color);
+    font-size: 25px;
+}
+
+#dhtChart {
+    margin-top: 20px;
+}
+
+/* Tag for devices-container */
+#tag {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 20px;
+    font-size: 20px;
+    color: var(--text-color);
+}
+.name {
+    width: 60%;
+    padding-left: 50px;
+}
+.status {
+    width: 40%;
+    text-align: center;
+}
+
+
+/* Switch container */
+.switch-container {
+    display: flex;
+    align-items: center;
+    margin: 20px;
+    
+}
+
+/* Label for the switch */
+.switch-label {
+    width: 60%;
+    margin-right: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+/* Switch container */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin: 0 auto;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--accent-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
