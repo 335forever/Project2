@@ -1,11 +1,12 @@
 const fs = require('fs');
+const path = require('path');
 
 module.exports = {
   mqtt: {
     brokerUrl: process.env.MQTT_BROKER || 'mqtts://a69vcsde92392-ats.iot.ap-southeast-1.amazonaws.com',
-    caFile: fs.readFileSync(process.env.MQTT_CA_FILE || './key/AmazonRootCA1.pem'),
-    certFile: fs.readFileSync(process.env.MQTT_CERT_FILE || './key/Device Certificate.crt'),
-    keyFile: fs.readFileSync(process.env.MQTT_KEY_FILE || './key/Private Key.key')
+    caFile: fs.readFileSync(process.env.MQTT_CA_FILE || path.resolve(__dirname, '../key/AmazonRootCA1.pem')),
+    certFile: fs.readFileSync(process.env.MQTT_CERT_FILE || path.resolve(__dirname, '../key/Device Certificate.crt')),
+    keyFile: fs.readFileSync(process.env.MQTT_KEY_FILE || path.resolve(__dirname, '../key/Private Key.key'))
   },
   db: {
     host: process.env.DB_HOST || 'localhost',

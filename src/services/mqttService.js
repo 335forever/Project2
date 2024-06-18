@@ -47,9 +47,7 @@ client.on('message', async (topic, message) => {
 
 const publish = async (topic,message) => {
   client.publish(topic, message, function (err) {
-    if (!err) {
-        console.log(`Message "${message}" published to topic "${topic}"`);
-    } else {
+    if (err) {
         console.error('Failed to publish message:', err);
     }
 });
