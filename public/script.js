@@ -118,8 +118,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             dhtChart.update();
         }
 
+        // Xác định URL cho WebSocket dựa vào môi trường
+        let wsUrl;
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            // Môi trường local
+            wsUrl = 'ws://localhost:8080';
+        } else {
+            // Môi trường triển khai (ví dụ: EC2 instance)
+            wsUrl = `ws://${window.location.hostname}:8080`;
+        }
+
         // WebSocket
-        const ws = new WebSocket('ws://localhost:8080');
+        const ws = new WebSocket(wsUrl);
 
         ws.onopen = () => {
             console.log('Connected to WebSocket server');
