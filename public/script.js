@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const ctx = document.getElementById('dhtChart').getContext('2d');
 
         // Gọi API để lấy dữ liệu ban đầu
-        const initialData = await fetch('http://localhost:3000/api/data/getdhtdata?nums=20');
+        const initialData = await fetch('/api/data/getdhtdata?nums=20');
         const initialDataJson = await initialData.json();
 
         // Mảng dữ liệu ban đầu
