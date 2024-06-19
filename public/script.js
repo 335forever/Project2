@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             wsUrl = 'ws://localhost:8080';
         } else {
             // Môi trường triển khai (ví dụ: EC2 instance)
-            wsUrl = `wss://${window.location.hostname}:8080`;
+            wsUrl = `ws://${window.location.hostname}:8080`;
         }
 
         // WebSocket
