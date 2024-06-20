@@ -17,9 +17,9 @@ const updateDeviceStatus = async (req, res) => {
 const notiHumidityChange = async (req, res) => {
   try {
     const humidity = req.body.humidity;
-    const humidityChangePercent = req.body.humidityChangePercent;
+    const humidityChange = req.body.humidityChange;
     
-    await mailService.sendNotiForHumidity(humidity,humidityChangePercent);
+    await mailService.sendNotiForHumidity(humidity,humidityChange);
 
     res.status(200).json({msg:'success'});
   } catch (error) {
@@ -30,9 +30,9 @@ const notiHumidityChange = async (req, res) => {
 const notiTemperatureChange = async (req, res) => {
   try {
     const temperature = req.body.temperature;
-    const temperatureChangePercent = req.body.temperatureChangePercent;
+    const temperatureChange = req.body.temperatureChange;
     
-    await mailService.sendNotiForTemperature(temperature,temperatureChangePercent);
+    await mailService.sendNotiForTemperature(temperature,temperatureChange);
 
     res.status(200).json({msg:'success'});
   } catch (error) {

@@ -25,8 +25,8 @@ int recordIndex = 0;
 int recordCount = 0;
 
 // Ngưỡng thay đổi (phần trăm)
-const float humidityThresholdPercent = 10.0;  // Ngưỡng thay đổi cho độ ẩm
-const float temperatureThresholdPercent = 5.0;  // Ngưỡng thay đổi cho nhiệt độ
+const float humidityThreshold = 10.0;  // Ngưỡng thay đổi cho độ ẩm
+const float temperatureThreshold = 5.0;  // Ngưỡng thay đổi cho nhiệt độ
 
 WiFiClientSecure net = WiFiClientSecure();
 PubSubClient client(net);
@@ -170,40 +170,39 @@ void messageHandler(char* topic, byte* payload, unsigned int length) {
   }
 }
 
-void sendHumidityPostRequest() {
+void sendHumidityPostRequest(float humidity,float humidityChange) {
   Serial.println("Phat hien do am thay doi dot ngot");
   HTTPClient http;
-  String url = "http://" + String(server_ip) + api_url;
+  String url = "http://" + String(server_ip) + "/api/devices/noti/humidity";
 
+  // Tạo một JSON object để chứa dữ liệu
+  StaticJsonDocument<200> jsonDocument;
+  jsonDocument["humidity"] = humidity;
+  jsonDocument["humidityChange"] = humidityChange;
+
+  // Chuyển đổi JSON object sang String
+  String jsonString;
+  serializeJson(jsonDocument, jsonString);
+
+  // Thiết lập header của request
   http.begin(url);
-  int httpCode = http.GET();
+  http.addHeader("Content-Type", "application/json");
 
+  // Gửi POST request với dữ liệu JSON
+  int httpCode = http.POST(jsonString);
+
+  // Kiểm tra kết quả của request
   if (httpCode > 0) {
-      if (httpCode == HTTP_CODE_OK) {
-          String payload = http.getString();
-          Serial.println("Get devices status successfully");
-
-          // Parse JSON
-          DynamicJsonDocument doc(bufferSize);
-          deserializeJson(doc, payload);
-
-          // Loop through JSON array
-          JsonArray devices = doc.as<JsonArray>();
-          for (JsonObject device : devices) {
-              int gpio = device["gpio"];
-              int status = device["status"];
-
-              // Set GPIO mode and initial state
-              pinMode(gpio, OUTPUT);
-              digitalWrite(gpio, status);
-          }
-      } else {
-          Serial.printf("HTTP request failed with error code %d\n", httpCode);
-      }
+    if (httpCode == HTTP_CODE_OK) {
+      String payload = http.getString();
+      Serial.println("Send noti response: " + payload);
+    } else {
+      Serial.printf("Send noti failed, error code: %d\n", httpCode);
+    }
   } else {
-      Serial.println("HTTP request failed");
+    Serial.printf("Send noti failed, error: %s\n", http.errorToString(httpCode).c_str());
   }
-
+  
   http.end();
 }
 
@@ -267,7 +266,7 @@ void loop() {
 
     if (humidityChangePercent > humidityThresholdPercent) {
       // Gửi tín hiệu độ ẩm tới server bằng POST API
-      sendHumidityPostRequest();
+      sendHumidityPostRequest(h,humidityChangePercent);
     }
     
     if (temperatureChangePercent > temperatureThresholdPercent) {
