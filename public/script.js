@@ -137,7 +137,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         ws.onmessage = (event) => {
             const newData = JSON.parse(event.data);
-            updateChartData(newData.temperature, newData.humidity, newData.current_time);
+            if (newData.temperature != undefined) updateChartData(newData.temperature, newData.humidity, newData.current_time);
+            if (newData.id != undefined) {
+                const checkbox = document.getElementById(`device-${newData.id}`);
+                if (checkbox) {
+                    checkbox.checked = newData.status === 1;
+                }
+            }
         };
 
         // Lấy dữ liệu device
@@ -158,6 +164,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.checked = device.status === 1; // Assume 'on' means checked
+            checkbox.id = `device-${device.id}`; // Gán id cho checkbox
 
             checkbox.addEventListener('change', () => updateDeviceStatus(device.id, checkbox.checked));
 
@@ -177,6 +184,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function updateDeviceStatus(deviceId, status) {
     try {
+        disableCheckbox(`device-${deviceId}`);
         const response = await fetch('/api/devices/update', {
             method: 'POST',
             headers: {
@@ -194,7 +202,38 @@ async function updateDeviceStatus(deviceId, status) {
 
         const result = await response.json();
         console.log('Device status updated:', result);
+        if (result.msg) {
+            showAlert("Thay đổi trạng thái thiết bị thành công!", 2500);
+        }
+        else {
+            toggleCheckbox(`device-${deviceId}`);
+            showAlert("Thay đổi trạng thái thiết bị không thành công!", 2500);
+        }
+        enableCheckbox(`device-${deviceId}`);
     } catch (error) {
         console.error('Error updating device status:', error);
     }
 }
+
+function disableCheckbox(id) {
+    document.getElementById(id).disabled = true;
+}
+
+function enableCheckbox(id) {
+    document.getElementById(id).disabled = false;
+}
+
+function toggleCheckbox(id) {
+    const checkbox = document.getElementById(id);
+    checkbox.checked = !checkbox.checked;
+}
+
+function showAlert(message, duration) {
+    var alertBox = document.getElementById('myAlert');
+    alertBox.textContent = message;
+    alertBox.style.display = 'block';
+  
+    setTimeout(function() {
+      alertBox.style.display = 'none';
+    }, duration);
+  }

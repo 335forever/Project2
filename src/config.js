@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
 
 module.exports = {
   mqtt: {
@@ -15,5 +16,12 @@ module.exports = {
     database: process.env.DB_NAME || 'database_for_prj2',
     charset: 'utf8mb4'
   },
-  wsPort: process.env.WS_PORT || 8080
+  wsPort: process.env.WS_PORT || 8080,
+  mailer: {
+    service: 'gmail',
+    auth: {
+      user: process.env.ADMIN_EMAIL,
+      pass: process.env.APP_PASSWORD
+    }
+  }
 };

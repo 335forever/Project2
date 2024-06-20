@@ -13,6 +13,21 @@ body {
     background-color: var(--main-background);
 }
 
+.alert {
+    display: none;
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px;
+    background-color: var(--sub-background);
+    color: var(--text-color);
+    text-align: center;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+
 h1 {
     text-align: center;
     color: var(--text-color);
@@ -32,7 +47,10 @@ fieldset legend {
 }
 
 #dhtChart {
-    margin-top: 20px;
+    width:  100%;
+    display: block;
+    padding:0;
+    margin:0;
 }
 
 /* Tag for devices-container */
