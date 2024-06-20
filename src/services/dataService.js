@@ -8,6 +8,10 @@ module.exports = {
                 "SELECT * FROM dht_data ORDER BY created_at DESC LIMIT ?",
                 [nums]
             );
+            // Sắp xếp lại mảng rows theo chiều tăng dần của created_at
+            rows.sort((a, b) => {
+                return new Date(a.created_at) - new Date(b.created_at);
+            });
             connection.release();
             return rows;
         } else {

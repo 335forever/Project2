@@ -9,6 +9,8 @@
 #define DHTPIN 13     // Digital pin connected to the DHT sensor
 #define DHTTYPE DHT11 // DHT 11
 
+#define MIN_NOTIFICATION_INTERVAL 600000
+
 const int bufferSize = JSON_ARRAY_SIZE(4) + 4*JSON_OBJECT_SIZE(4) + 360;
 
 float h;
@@ -27,6 +29,9 @@ int recordCount = 0;
 // Ngưỡng thay đổi (phần trăm)
 const float humidityThreshold = 10.0;  // Ngưỡng thay đổi cho độ ẩm
 const float temperatureThreshold = 5.0;  // Ngưỡng thay đổi cho nhiệt độ
+
+unsigned long lastHumidityNotificationTime = 0;
+unsigned long lastTemperatureNotificationTime = 0;
 
 WiFiClientSecure net = WiFiClientSecure();
 PubSubClient client(net);
@@ -206,8 +211,40 @@ void sendHumidityPostRequest(float humidity,float humidityChange) {
   http.end();
 }
 
-void sendTemperaturePostRequest() {
+void sendTemperaturePostRequest(float temperature,float temperatureChange) {
   Serial.println("Phat hien nhiet do thay doi dot ngot");
+  HTTPClient http;
+  String url = "http://" + String(server_ip) + "/api/devices/noti/temperature";
+
+  // Tạo một JSON object để chứa dữ liệu
+  StaticJsonDocument<200> jsonDocument;
+  jsonDocument["temperature"] = temperature;
+  jsonDocument["temperatureChange"] = temperatureChange;
+
+  // Chuyển đổi JSON object sang String
+  String jsonString;
+  serializeJson(jsonDocument, jsonString);
+
+  // Thiết lập header của request
+  http.begin(url);
+  http.addHeader("Content-Type", "application/json");
+
+  // Gửi POST request với dữ liệu JSON
+  int httpCode = http.POST(jsonString);
+
+  // Kiểm tra kết quả của request
+  if (httpCode > 0) {
+    if (httpCode == HTTP_CODE_OK) {
+      String payload = http.getString();
+      Serial.println("Send noti response: " + payload);
+    } else {
+      Serial.printf("Send noti failed, error code: %d\n", httpCode);
+    }
+  } else {
+    Serial.printf("Send noti failed, error: %s\n", http.errorToString(httpCode).c_str());
+  }
+  
+  http.end();
 }
 
 float calculateAverage(float records[]) {
@@ -261,17 +298,23 @@ void loop() {
     float avgHumidity = calculateAverage(humidityRecords);
     float avgTemperature = calculateAverage(temperatureRecords);
 
-    float humidityChangePercent = abs(h - avgHumidity) / avgHumidity * 100;
-    float temperatureChangePercent = abs(t - avgTemperature) / avgTemperature * 100;
+    float humidityChange = h - avgHumidity;
+    float temperatureChange = t - avgTemperature;\
 
-    if (humidityChangePercent > humidityThresholdPercent) {
+    unsigned long currentMillis = millis();
+
+    if (humidityChange > humidityThreshold && 
+      currentMillis - lastHumidityNotificationTime >= MIN_NOTIFICATION_INTERVAL) {
       // Gửi tín hiệu độ ẩm tới server bằng POST API
-      sendHumidityPostRequest(h,humidityChangePercent);
+      sendHumidityPostRequest(h,humidityChange);
+      lastHumidityNotificationTime = currentMillis;
     }
     
-    if (temperatureChangePercent > temperatureThresholdPercent) {
+    if (temperatureChange > temperatureThreshold && 
+      currentMillis - lastTemperatureNotificationTime >= MIN_NOTIFICATION_INTERVAL) {
       // Gửi tín hiệu nhiệt độ tới server bằng POST API
-      sendTemperaturePostRequest();
+      sendTemperaturePostRequest(t,temperatureChange);
+      lastTemperatureNotificationTime = currentMillis;
     }
   }
 
