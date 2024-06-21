@@ -299,7 +299,7 @@ void loop() {
     float avgTemperature = calculateAverage(temperatureRecords);
 
     float humidityChange = h - avgHumidity;
-    float temperatureChange = t - avgTemperature;\
+    float temperatureChange = t - avgTemperature;
 
     unsigned long currentMillis = millis();
 
